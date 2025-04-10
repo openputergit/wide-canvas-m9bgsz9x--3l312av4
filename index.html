@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyayalaya - AI Legal Assistant</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+        }
+        .chat-container {
+            height: calc(100vh - 300px);
+            min-height: 400px;
+        }
+        .chat-messages {
+            height: calc(100% - 60px);
+        }
+        .lawyer-card {
+            transition: all 0.3s ease;
+        }
+        .lawyer-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        @media (max-width: 640px) {
+            .chat-container {
+                height: calc(100vh - 200px);
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-gray-900 p-4 shadow-lg">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <a href="#" class="text-2xl font-bold mb-4 sm:mb-0 text-blue-400">Nyayalaya</a>
+            <div class="flex flex-wrap justify-center space-x-2 sm:space-x-4">
+                <button onclick="showSection('home')" class="hover:text-blue-400 px-2 py-1">Home</button>
+                <button onclick="showSection('chat')" class="hover:text-blue-400 px-2 py-1">Chat</button>
+                <button onclick="showSection('lawyers')" class="hover:text-blue-400 px-2 py-1">Find Lawyers</button>
+                <button onclick="toggleAuth()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="container mx-auto px-4 py-16">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold mb-6">Your AI Legal Assistant</h1>
+            <p class="text-xl mb-8">Get instant legal guidance for accidents, self-defense, and personal attacks</p>
+            <button onclick="showSection('chat')" class="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-lg text-lg font-semibold transition duration-300 transform hover:scale-105">
+                Get Help Now
+            </button>
+            
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <i class="bi bi-car-front text-5xl text-blue-400 mb-4"></i>
+                    <h2 class="text-xl font-semibold mb-2">Road Accidents</h2>
+                    <p class="text-gray-300">Get immediate guidance on what to do after an accident, including documentation and legal steps.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <i class="bi bi-shield text-5xl text-blue-400 mb-4"></i>
+                    <h2 class="text-xl font-semibold mb-2">Self Defense</h2>
+                    <p class="text-gray-300">Learn your rights and responsibilities when forced to defend yourself or others.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <i class="bi bi-people text-5xl text-blue-400 mb-4"></i>
+                    <h2 class="text-xl font-semibold mb-2">Personal Attacks</h2>
+                    <p class="text-gray-300">Get legal advice for dealing with verbal, physical, or other forms of personal attacks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Section -->
+    <section id="chat" class="container mx-auto px-4 py-8 hidden">
+        <h2 class="text-3xl font-bold mb-6 text-center">AI Legal Consultation</h2>
+        <div class="max-w-3xl mx-auto bg-gray-800 rounded-lg p-4 shadow-lg">
+            <div class="chat-container">
+                <div id="chatMessages" class="chat-messages overflow-y-auto mb-4 p-4 bg-gray-700 rounded-lg">
+                    <!-- Initial message -->
+                    <div class="mb-4">
+                        <div class="inline-block px-4 py-2 rounded-lg bg-gray-600">
+                            Hello! I'm your AI legal assistant. How can I help you today? Feel free to ask about road accidents, self-defense situations, or personal attacks.
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="userInput" placeholder="What should I do after an accident?" class="flex-1 p-3 rounded-lg bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition duration-300">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 text-center text-sm text-gray-400">
+                <p>Need professional advice? <a href="#" onclick="showSection('lawyers')" class="text-blue-400 hover:underline">Find a lawyer</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lawyers Section -->
+    <section id="lawyers" class="container mx-auto px-4 py-8 hidden">
+        <h2 class="text-3xl font-bold mb-8 text-center">Find Experienced Lawyers</h2>
+        
+        <!-- Filters -->
+        <div class="mb-8 bg-gray-800 p-4 rounded-lg shadow-lg">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="expertise" class="block mb-2">Expertise</label>
+                    <select id="expertise" class="w-full p-2 rounded bg-gray-700">
+                        <option value="">All Expertise</option>
+                        <option value="Criminal Law">Criminal Law</option>
+                        <option value="Civil Law">Civil Law</option>
+                        <option value="Personal Injury">Personal Injury</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="location" class="block mb-2">Location</label>
+                    <select id="location" class="w-full p-2 rounded bg-gray-700">
+                        <option value="">All Locations</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Bangalore">Bangalore</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="experience" class="block mb-2">Experience</label>
+                    <select id="experience" class="w-full p-2 rounded bg-gray-700">
+                        <option value="">Any Experience</option>
+                        <option value="5+">5+ Years</option>
+                        <option value="10+">10+ Years</option>
+                        <option value="15+">15+ Years</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="applyFilters()" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="lawyersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Lawyer cards will be populated here -->
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-8 rounded-lg w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold" id="authTitle">Login</h3>
+                <button onclick="toggleAuth()" class="text-gray-400 hover:text-white">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <form id="authForm" class="space-y-4">
+                <div id="nameField" class="hidden">
+                    <label for="name" class="block mb-1">Full Name</label>
+                    <input type="text" id="name" placeholder="Full Name" class="w-full p-3 rounded-lg bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="email" class="block mb-1">Email</label>
+                    <input type="email" id="email" placeholder="Email" class="w-full p-3 rounded-lg bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="password" class="block mb-1">Password</label>
+                    <input type="password" id="password" placeholder="Password" class="w-full p-3 rounded-lg bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg transition duration-300">
+                    <span id="authButtonText">Login</span>
+                </button>
+            </form>
+            
+            <div class="mt-4 text-center">
+                <p id="switchAuthText">Don't have an account? 
+                    <a href="#" onclick="switchAuthMode()" class="text-blue-400 hover:underline">Register</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-900 mt-12 py-8 px-4">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-6 md:mb-0">
+                    <h2 class="text-2xl font-bold text-blue-400 mb-4">Nyayalaya</h2>
+                    <p class="text-gray-400 max-w-md">AI-powered legal guidance for everyone. Get instant advice and connect with professional lawyers.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" onclick="showSection('home')" class="text-gray-400 hover:text-blue-400">Home</a></li>
+                            <li><a href="#" onclick="showSection('chat')" class="text-gray-400 hover:text-blue-400">Chat</a></li>
+                            <li><a href="#" onclick="showSection('lawyers')" class="text-gray-400 hover:text-blue-400">Find Lawyers</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Legal</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-blue-400">Privacy Policy</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-blue-400">Terms of Use</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-blue-400">Disclaimer</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2023 Nyayalaya. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Dummy lawyers data
+        const lawyersData = [
+            { 
+                name: 'Adv. Rahul Sharma', 
+                experience: '15 years', 
+                expertise: 'Criminal Law', 
+                location: 'Mumbai', 
+                rating: 4.8,
+                cases: 120,
+                image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'
+            },
+            { 
+                name: 'Adv. Neha Patel', 
+                experience: '10 years', 
+                expertise: 'Civil Law', 
+                location: 'Delhi', 
+                rating: 4.5,
+                cases: 85,
+                image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'
+            },
+            { 
+                name: 'Adv. Harpreet Singh', 
+                experience: '20 years', 
+                expertise: 'Personal Injury', 
+                location: 'Bangalore', 
+                rating: 4.9,
+                cases: 200,
+                image: 'https://images.unsplash.com/photo-1556157382-97eda2f9e2bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'
+            },
+            { 
+                name: 'Adv. Priya Desai', 
+                experience: '8 years', 
+                expertise: 'Family Law', 
+                location: 'Mumbai', 
+                rating: 4.3,
+                cases: 60,
+                image: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'
+            },
+            { 
+                name: 'Adv. Arun Kumar', 
+                experience: '12 years', 
+                expertise: 'Criminal Law', 
+                location: 'Delhi', 
+                rating: 4.7,
+                cases: 150,
+                image: 'https://images.unsplash.com/photo-1595152452543-e5fc28ebc2b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'
+            },
+            { 
+                name: 'Adv. Mira Verma', 
+                experience: '5 years', 
+                expertise: 'Civil Law', 
+                location: 'Bangalore', 
+                rating: 4.2,
+                cases: 40,
+                image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'
+            }
+        ];
+
+        // Show/hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            if(sectionId === 'lawyers') populateLawyers();
+        }
+
+        // Toggle auth modal
+        function toggleAuth() {
+            document.getElementById('authModal').classList.toggle('hidden');
+        }
+
+        // Switch between login and register
+        function switchAuthMode() {
+            const isLogin = document.getElementById('authTitle').innerText === 'Login';
+            document.getElementById('authTitle').innerText = isLogin ? 'Register' : 'Login';
+            document.getElementById('nameField').classList.toggle('hidden');
+            document.getElementById('authButtonText').innerText = isLogin ? 'Register' : 'Login';
+            document.getElementById('switchAuthText').innerHTML = isLogin 
+                ? 'Already have an account? <a href="#" onclick="switchAuthMode()" class="text-blue-400 hover:underline">Login</a>' 
+                : 'Don\'t have an account? <a href="#" onclick="switchAuthMode()" class="text-blue-400 hover:underline">Register</a>';
+        }
+
+        // Handle authentication form submission
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const isLogin = document.getElementById('authTitle').innerText === 'Login';
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!isLogin) {
+                const name = document.getElementById('name').value;
+                console.log('Registering user:', name, email);
+            } else {
+                console.log('Logging in user:', email);
+            }
+            
+            // Close modal
+            toggleAuth();
+            
+            // Display success message
+            alert(isLogin ? 'Login successful!' : 'Registration successful!');
+        });
+
+        // Populate lawyers
+        function populateLawyers(filtered = false) {
+            const lawyersList = document.getElementById('lawyersList');
+            
+            let lawyers = lawyersData;
+            
+            // Apply filters if requested
+            if (filtered) {
+                const expertise = document.getElementById('expertise').value;
+                const location = document.getElementById('location').value;
+                const experience = document.getElementById('experience').value;
+                
+                if (expertise) {
+                    lawyers = lawyers.filter(lawyer => lawyer.expertise === expertise);
+                }
+                
+                if (location) {
+                    lawyers = lawyers.filter(lawyer => lawyer.location === location);
+                }
+                
+                if (experience) {
+                    const years = parseInt(experience);
+                    lawyers = lawyers.filter(lawyer => parseInt(lawyer.experience) >= years);
+                }
+            }
+            
+            lawyersList.innerHTML = lawyers.map(lawyer => `
+                <div class="lawyer-card bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+                    <div class="relative">
+                        <img src="${lawyer.image}" alt="${lawyer.name}" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-full text-sm">
+                            ${lawyer.rating} ★
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">${lawyer.name}</h3>
+                        <div class="mb-4 text-gray-300">
+                            <p class="flex items-center"><i class="bi bi-briefcase mr-2"></i> ${lawyer.experience}</p>
+                            <p class="flex items-center"><i class="bi bi-award mr-2"></i> ${lawyer.expertise}</p>
+                            <p class="flex items-center"><i class="bi bi-geo-alt mr-2"></i> ${lawyer.location}</p>
+                            <p class="flex items-center"><i class="bi bi-file-earmark-text mr-2"></i> ${lawyer.cases} Cases</p>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition duration-300">
+                                Contact
+                            </button>
+                            <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded transition duration-300">
+                                View Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Display message if no lawyers found
+            if (lawyers.length === 0) {
+                lawyersList.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <p class="text-lg text-gray-400">No lawyers found matching your criteria.</p>
+                        <button onclick="resetFilters()" class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                            Reset Filters
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Apply lawyer filters
+        function applyFilters() {
+            populateLawyers(true);
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('expertise').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('experience').value = '';
+            populateLawyers();
+        }
+
+        // Chat functionality
+        let chatMessages = [
+            { text: "Hello! I'm your AI legal assistant. How can I help you today? Feel free to ask about road accidents, self-defense situations, or personal attacks.", sender: 'ai' }
+        ];
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if(!message) return;
+
+            // Add user message
+            chatMessages.push({ text: message, sender: 'user' });
+            
+            // Generate AI response based on user input
+            let response = "I understand you need help. Please provide more details about your situation, and I'll guide you through the necessary legal steps.";
+            
+            // Simple keyword matching for more context-specific responses
+            if (message.toLowerCase().includes('accident')) {
+                response = "I understand you've been in an accident. Here are the immediate steps you should take:\n\n1. Ensure your safety and check for injuries\n2. Call emergency services if needed\n3. Document the scene with photos\n4. Exchange information with other involved parties\n5. Report to police and your insurance company\n\nWould you like me to elaborate on any of these steps?";
+            } else if (message.toLowerCase().includes('self defense') || message.toLowerCase().includes('self-defense')) {
+                response = "Regarding self-defense situations, the law generally allows you to use reasonable force to protect yourself or others from imminent harm. Key factors include:\n\n• Proportionality of response\n• Whether you could have retreated\n• Who initiated the confrontation\n\nCan you tell me more about your specific situation so I can provide more tailored guidance?";
+            } else if (message.toLowerCase().includes('attack')) {
+                response = "I'm sorry to hear you've experienced an attack. Your immediate priorities should be:\n\n1. Seek medical attention for any injuries\n2. Report the incident to police\n3. Document everything with photos and notes\n4. Gather witness information\n\nWould you like information on restraining orders or legal actions you can take?";
+            }
+            
+            setTimeout(() => {
+                chatMessages.push({ text: response, sender: 'ai' });
+                updateChat();
+            }, 1000);
+
+            input.value = '';
+            updateChat();
+        }
+
+        // Enter key to send message
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function updateChat() {
+            const chatContainer = document.getElementById('chatMessages');
+            chatContainer.innerHTML = chatMessages.map(msg => `
+                <div class="mb-4 ${msg.sender === 'user' ? 'text-right' : ''}">
+                    <div class="inline-block px-4 py-2 rounded-lg ${
+                        msg.sender === 'user' 
+                            ? 'bg-blue-600' 
+                            : 'bg-gray-600'
+                    } max-w-xs sm:max-w-md whitespace-pre-wrap">
+                        ${msg.text}
+                    </div>
+                </div>
+            `).join('');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Show home section by default
+        showSection('home');
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
